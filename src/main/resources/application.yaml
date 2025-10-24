@@ -1,3 +1,24 @@
 spring:
   application:
     name: InnowisePaymentService
+
+  data:
+    mongodb:
+      uri: ${MONGO_URI}
+
+  liquibase:
+    enabled: false
+    #change-log: classpath:db/changelog/main-changelog.xml
+    #url: ${spring.data.mongodb.uri}
+
+app:
+  liquibase:
+    enabled: true
+    change-log: db/changelog/main-changelog.xml
+    url: ${spring.data.mongodb.uri}
+
+
+logging:
+  level:
+    liquibase: DEBUG
+    org.springframework.boot.autoconfigure.liquibase: DEBUG
