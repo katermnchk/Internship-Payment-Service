@@ -28,6 +28,7 @@ public class Payment {
     @Indexed
     private PaymentStatus status;
 
+    @Indexed
     private Instant timestamp;
 
     private BigDecimal paymentAmount;

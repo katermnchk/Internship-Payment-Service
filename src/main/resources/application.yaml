@@ -8,8 +8,6 @@ spring:
 
   liquibase:
     enabled: false
-    #change-log: classpath:db/changelog/main-changelog.xml
-    #url: ${spring.data.mongodb.uri}
 
 app:
   liquibase:
@@ -17,6 +15,9 @@ app:
     change-log: db/changelog/main-changelog.xml
     url: ${spring.data.mongodb.uri}
 
+services:
+  api-gateway:
+    url: ${GATEWAY_URL}
 
 logging:
   level:

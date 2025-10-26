@@ -1,7 +1,10 @@
 package com.innowise.internship.service;
 
+import com.innowise.internship.dto.PaymentRequestDto;
+import com.innowise.internship.dto.PaymentResponseDto;
 import com.innowise.internship.entity.Payment;
 import com.innowise.internship.entity.PaymentStatus;
+import com.innowise.internship.mapper.PaymentMapper;
 import com.innowise.internship.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -9,37 +12,57 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;
+    private final PaymentMapper paymentMapper;
+    private final RandomNumberService randomNumberService;
 
 
     @Override
-    public Payment createPayment(Payment payment) {
-        return paymentRepository.save(payment);
+    public PaymentResponseDto createPayment(PaymentRequestDto paymentDto) {
+        Payment payment = paymentMapper.paymentDtoToEntity(paymentDto);
+
+        payment.setTimestamp(Instant.now());
+
+        boolean isEven = randomNumberService.isNumberEven();
+        payment.setStatus(isEven ? PaymentStatus.SUCCESS : PaymentStatus.FAILED);
+
+        Payment savedPayment = paymentRepository.save(payment);
+
+        return paymentMapper.entityToPaymentDto(savedPayment);
     }
 
     @Override
-    public List<Payment> getPaymentsByOrderId(String orderId) {
-        return paymentRepository.findByOrderId(orderId);
+    public List<PaymentResponseDto> getPaymentsByOrderId(String orderId) {
+        return paymentRepository.findByOrderId(orderId).stream()
+                .map(paymentMapper::entityToPaymentDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Payment> getPaymentsByUserId(String userId) {
-        return paymentRepository.findByUserId(userId);
+    public List<PaymentResponseDto> getPaymentsByUserId(String userId) {
+        return paymentRepository.findByUserId(userId).stream()
+                .map(paymentMapper::entityToPaymentDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Payment> getPaymentsByStatus(PaymentStatus status) {
-        return paymentRepository.findByStatus(status);
+    public List<PaymentResponseDto> getPaymentsByStatus(PaymentStatus status) {
+        return paymentRepository.findByStatus(status).stream()
+                .map(paymentMapper::entityToPaymentDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Payment> getPaymentsByStatuses(List<PaymentStatus> statuses) {
-        return paymentRepository.findByStatusIn(statuses);
+    public List<PaymentResponseDto> getPaymentsByStatuses(List<PaymentStatus> statuses) {
+        return paymentRepository.findByStatusIn(statuses).stream()
+                .map(paymentMapper::entityToPaymentDto)
+                .collect(Collectors.toList());
     }
 
     @Override

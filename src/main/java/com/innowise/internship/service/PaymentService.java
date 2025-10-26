@@ -1,5 +1,7 @@
 package com.innowise.internship.service;
 
+import com.innowise.internship.dto.PaymentRequestDto;
+import com.innowise.internship.dto.PaymentResponseDto;
 import com.innowise.internship.entity.Payment;
 import com.innowise.internship.entity.PaymentStatus;
 
@@ -9,15 +11,15 @@ import java.util.List;
 
 public interface PaymentService {
 
-    Payment createPayment(Payment payment);
+    PaymentResponseDto createPayment(PaymentRequestDto paymentDto);
 
-    List<Payment> getPaymentsByOrderId(String orderId);
+    List<PaymentResponseDto> getPaymentsByOrderId(String orderId);
 
-    List<Payment> getPaymentsByUserId(String userId);
+    List<PaymentResponseDto> getPaymentsByUserId(String userId);
 
-    List<Payment> getPaymentsByStatus(PaymentStatus status);
+    List<PaymentResponseDto> getPaymentsByStatus(PaymentStatus status);
 
-    List<Payment> getPaymentsByStatuses(List<PaymentStatus> statuses);
+    List<PaymentResponseDto> getPaymentsByStatuses(List<PaymentStatus> statuses);
 
     BigDecimal getTotalSum(Instant start, Instant end);
 
