@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  payment-service:
+    build: .
+    container_name: payment-service
+    environment:
+      SERVER_PORT: ${SERVER_PORT}
+      GATEWAY_URL: ${GATEWAY_URL}
+      RANDOM_NUMBER_API_PATH: ${RANDOM_NUMBER_API_PATH}
+      MONGO_URI: mongodb://${MONGO_HOST}:${MONGO_PORT}/${MONGO_DB_NAME}
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:${KAFKA_PORT_INTERNAL}
+      SPRING_KAFKA_CONSUMER_GROUP_ID: payment-group
+      KAFKA_TOPIC_CREATE_ORDER: ${KAFKA_TOPIC_CREATE_ORDER}
+      KAFKA_TOPIC_CREATE_PAYMENT: ${KAFKA_TOPIC_CREATE_PAYMENT}
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    networks:
+      - ${NETWORK_NAME}
+    depends_on:
+      - kafka
+      - mongodb
+
+  mongodb:
+    image: mongo:6.0
+    container_name: ${MONGO_HOST}
+    ports:
+      - "${MONGO_PORT}:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - ${NETWORK_NAME}
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.4
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: ${ZOOKEEPER_PORT}
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "${ZOOKEEPER_PORT}:${ZOOKEEPER_PORT}"
+    networks:
+      - ${NETWORK_NAME}
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.4
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "${KAFKA_PORT_EXTERNAL}:${KAFKA_PORT_EXTERNAL}"
+    environment:
+      KAFKA_BROKER_ID: ${KAFKA_BROKER_ID}
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:${ZOOKEEPER_PORT}
+      KAFKA_ADVERTISED_LISTENERS: ${KAFKA_ADVERTISED_LISTENERS}
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: ${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}
+      KAFKA_INTER_BROKER_LISTENER_NAME: ${KAFKA_INTER_BROKER_LISTENER_NAME}
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: ${KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR}
+    networks:
+      - ${NETWORK_NAME}
+
+volumes:
+  mongo_data:
+
+networks:
+  app_network:
+    external: true

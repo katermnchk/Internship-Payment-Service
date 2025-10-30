@@ -1,11 +1,15 @@
-package com.innowise.internship.service;
+package com.innowise.internship.service.impl;
 
 import com.innowise.internship.dto.PaymentRequestDto;
 import com.innowise.internship.dto.PaymentResponseDto;
+import com.innowise.internship.dto.kafka.PaymentCreatedEvent;
 import com.innowise.internship.entity.Payment;
 import com.innowise.internship.entity.PaymentStatus;
 import com.innowise.internship.mapper.PaymentMapper;
 import com.innowise.internship.repository.PaymentRepository;
+import com.innowise.internship.service.KafkaProducerService;
+import com.innowise.internship.service.PaymentService;
+import com.innowise.internship.service.RandomNumberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +25,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final PaymentMapper paymentMapper;
     private final RandomNumberService randomNumberService;
-
+    private final KafkaProducerService kafkaProducerService;
 
     @Override
     public PaymentResponseDto createPayment(PaymentRequestDto paymentDto) {
@@ -33,6 +37,12 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setStatus(isEven ? PaymentStatus.SUCCESS : PaymentStatus.FAILED);
 
         Payment savedPayment = paymentRepository.save(payment);
+
+        PaymentCreatedEvent paymentCreatedEvent = new PaymentCreatedEvent(
+                String.valueOf(savedPayment.getOrderId()),
+                String.valueOf(savedPayment.getStatus().toString())
+        );
+        kafkaProducerService.sendPaymentCreatedEvent(paymentCreatedEvent);
 
         return paymentMapper.entityToPaymentDto(savedPayment);
     }

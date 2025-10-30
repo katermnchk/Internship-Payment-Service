@@ -25,5 +25,5 @@ public class PaymentRequestDto {
 
     @NotNull(message = "Payment amount can't be null")
     @Positive(message = "Payment amount must be positive")
-    private BigDecimal amount;
+    private BigDecimal paymentAmount;
 }
