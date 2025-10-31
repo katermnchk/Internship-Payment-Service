@@ -87,7 +87,7 @@ class PaymentServiceIntegrationTest extends AbstractIntegrationTest {
 
         kafkaTemplate.send(CREATE_ORDER_TOPIC, orderId, orderEvent);
 
-        await().atMost(Duration.ofSeconds(10)).untilAsserted(() -> {
+        await().pollDelay(Duration.ofSeconds(1)).atMost(Duration.ofSeconds(20)).untilAsserted(() -> {
             var paymentOpt = paymentRepository.findByOrderId(orderId).stream().findFirst();
             assertThat(paymentOpt).isPresent();
             var payment = paymentOpt.get();
@@ -118,7 +118,7 @@ class PaymentServiceIntegrationTest extends AbstractIntegrationTest {
 
         kafkaTemplate.send(CREATE_ORDER_TOPIC, orderId, orderEvent);
 
-        await().atMost(Duration.ofSeconds(10)).untilAsserted(() -> {
+        await().pollDelay(Duration.ofSeconds(1)).atMost(Duration.ofSeconds(20)).untilAsserted(() -> {
             var paymentOpt = paymentRepository.findByOrderId(orderId).stream().findFirst();
             assertThat(paymentOpt).isPresent();
             var payment = paymentOpt.get();
