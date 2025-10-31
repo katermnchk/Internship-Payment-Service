@@ -11,6 +11,7 @@ import com.innowise.internship.service.KafkaProducerService;
 import com.innowise.internship.service.PaymentService;
 import com.innowise.internship.service.RandomNumberService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;
@@ -42,6 +44,7 @@ public class PaymentServiceImpl implements PaymentService {
                 String.valueOf(savedPayment.getOrderId()),
                 String.valueOf(savedPayment.getStatus().toString())
         );
+        log.info("Sending PaymentCreatedEvent for orderId {}", savedPayment.getOrderId());
         kafkaProducerService.sendPaymentCreatedEvent(paymentCreatedEvent);
 
         return paymentMapper.entityToPaymentDto(savedPayment);
