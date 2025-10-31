@@ -22,7 +22,6 @@ public class KafkaConsumerServiceImpl implements KafkaConsumerService {
             groupId = "${spring.kafka.consumer.group-id}"
     )
     public void handleOrderCreatedEvent(OrderCreatedEvent orderCreatedEvent) {
-
         log.info("Received OrderCreatedEvent for orderId {}", orderCreatedEvent.getOrderId());
         PaymentRequestDto paymentRequestDto = new PaymentRequestDto();
         paymentRequestDto.setOrderId(orderCreatedEvent.getOrderId());
