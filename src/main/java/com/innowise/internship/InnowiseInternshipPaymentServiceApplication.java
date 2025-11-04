@@ -1,12 +1,11 @@
 package com.innowise.internship;
 
-import com.innowise.internship.config.LiquibaseCustomProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
 @SpringBootApplication
-@EnableConfigurationProperties(LiquibaseCustomProperties.class)
+@ConfigurationPropertiesScan
 public class InnowiseInternshipPaymentServiceApplication {
 
     public static void main(String[] args) {

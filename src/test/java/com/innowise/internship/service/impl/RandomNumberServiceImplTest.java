@@ -1,33 +1,28 @@
 package com.innowise.internship.service.impl;
 
-import org.junit.jupiter.api.BeforeEach;
+import com.innowise.internship.client.RandomNumberClient;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Mockito;
-import org.mockito.Spy;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class RandomNumberServiceImplTest {
 
+    @Mock
+    private RandomNumberClient randomNumberClient;
+
+    @InjectMocks
     private RandomNumberServiceImpl randomNumberService;
-
-    @BeforeEach
-    void setUp() {
-        RandomNumberServiceImpl realService =
-                new RandomNumberServiceImpl("http://localhost:8080", "/api/random");
-
-        randomNumberService = Mockito.spy(realService);
-    }
 
     private static Stream<Arguments> provideRandomNumbers() {
         return Stream.of(
@@ -40,7 +35,7 @@ class RandomNumberServiceImplTest {
     @ParameterizedTest
     @MethodSource("provideRandomNumbers")
     void givenRandomNumbers_whenCheckIsNumberEven_thenReturnBoolean(Optional<Integer> number, boolean expected) {
-        doReturn(number).when(randomNumberService).getRandomNumber();
+        when(randomNumberClient.getRandomNumber()).thenReturn(number);
         boolean isEven = randomNumberService.isNumberEven();
         assertEquals(expected, isEven);
     }

@@ -16,12 +16,12 @@ public class MongoLiquibaseRunner {
 
     @PostConstruct
     public void runMigrations() {
-        if (!properties.isEnabled()) {
+        if (!properties.enabled()) {
             return;
         }
 
-        String changeLogPath = properties.getChangeLog();
-        String url = properties.getUrl();
+        String changeLogPath = properties.changeLog();
+        String url = properties.url();
 
         try (Database database = DatabaseFactory.getInstance().openDatabase(
                 url, null, null, null, new ClassLoaderResourceAccessor()
