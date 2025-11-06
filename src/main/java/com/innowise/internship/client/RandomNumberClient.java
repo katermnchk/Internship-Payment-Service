@@ -1,14 +1,15 @@
 package com.innowise.internship.client;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.util.Optional;
 
 @Component
+@Slf4j
 public class RandomNumberClient {
 
     private final WebClient webClient;
@@ -30,16 +31,22 @@ public class RandomNumberClient {
 
         try {
 
-            Integer number = webClient.get()
-                    .uri(randomNumberPath)
+            String responseBody = webClient.get()
+                    .uri(fullUrl)
                     .retrieve()
-                    .bodyToMono(Integer.class)
+                    .bodyToMono(String.class)
                     .timeout(Duration.ofSeconds(10))
                     .block();
 
-            return Optional.ofNullable(number);
+            if (responseBody != null && !responseBody.trim().isEmpty()) {
+                Integer number = Integer.parseInt(responseBody.trim());
+                return Optional.of(number);
+            } else {
+                return Optional.empty();
+            }
 
         } catch (Exception ex) {
+            log.error("Failed to get random number", ex);
             return Optional.empty();
         }
     }
